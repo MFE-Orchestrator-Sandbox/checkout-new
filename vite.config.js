@@ -10,7 +10,8 @@ export default defineConfig({
       name: "remote_app",
       filename: "remoteEntry.js",
       exposes: {
-        './Button': './src/components/Button'
+        './Button': './src/components/Button',
+        './Landing': './src/components/Landing'
       },
       shared: ['react','react-dom']
     })
