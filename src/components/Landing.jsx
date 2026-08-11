@@ -292,93 +292,99 @@ export const Landing = () => {
 				</section>
 
 				<section className="section section--alt" id="funzionalita">
-					<Reveal as="h2" className="section__title">
-						Progettato per chi
-						<br />
-						rilascia spesso.
-					</Reveal>
-					<div className="bento">
-						{FEATURES.map((feature, i) => (
-							<Reveal
-								as="article"
-								key={feature.title}
-								delay={i * 70}
-								className={`card${feature.size === "wide" ? " card--wide" : ""}`}>
-								<p className="card__kicker">{feature.kicker}</p>
-								<h3 className="card__title">{feature.title}</h3>
-								<p className="card__body">{feature.body}</p>
-							</Reveal>
-						))}
+					<div className="section__inner">
+						<Reveal as="h2" className="section__title">
+							Progettato per chi
+							<br />
+							rilascia spesso.
+						</Reveal>
+						<div className="bento">
+							{FEATURES.map((feature, i) => (
+								<Reveal
+									as="article"
+									key={feature.title}
+									delay={i * 70}
+									className={`card${feature.size === "wide" ? " card--wide" : ""}`}>
+									<p className="card__kicker">{feature.kicker}</p>
+									<h3 className="card__title">{feature.title}</h3>
+									<p className="card__body">{feature.body}</p>
+								</Reveal>
+							))}
+						</div>
 					</div>
 				</section>
 
 				<section className="section" id="architettura">
-					<Reveal as="p" className="section__kicker">
-						Architettura
-					</Reveal>
-					<Reveal as="h2" className="section__title" delay={60}>
-						Risolto a runtime.
-					</Reveal>
-					<Reveal as="p" className="section__lede" delay={120}>
-						L'host non conosce gli indirizzi dei remote: li chiede. Cambiare versione è cambiare una
-						riga nel registry, non un deploy.
-					</Reveal>
-					<Reveal className="diagram__frame" delay={180}>
-						<Diagram />
-					</Reveal>
+					<div className="section__inner">
+						<Reveal as="p" className="section__kicker">
+							Architettura
+						</Reveal>
+						<Reveal as="h2" className="section__title" delay={60}>
+							Risolto a runtime.
+						</Reveal>
+						<Reveal as="p" className="section__lede" delay={120}>
+							L'host non conosce gli indirizzi dei remote: li chiede. Cambiare versione è cambiare
+							una riga nel registry, non un deploy.
+						</Reveal>
+						<Reveal className="diagram__frame" delay={180}>
+							<Diagram />
+						</Reveal>
 
-					<div className="steps">
-						{STEPS.map((step, i) => (
-							<Reveal as="article" className="step" key={step.n} delay={i * 90}>
-								<span className="step__n">{step.n}</span>
-								<h3 className="step__title">{step.title}</h3>
-								<p className="step__body">{step.body}</p>
-							</Reveal>
-						))}
+						<div className="steps">
+							{STEPS.map((step, i) => (
+								<Reveal as="article" className="step" key={step.n} delay={i * 90}>
+									<span className="step__n">{step.n}</span>
+									<h3 className="step__title">{step.title}</h3>
+									<p className="step__body">{step.body}</p>
+								</Reveal>
+							))}
+						</div>
 					</div>
 				</section>
 
 				<section className="section section--alt" id="deploy">
-					<Reveal as="p" className="section__kicker">
-						Deploy
-					</Reveal>
-					<Reveal as="h2" className="section__title" delay={60}>
-						Un tag. Ed è online.
-					</Reveal>
-					<Reveal as="p" className="section__lede" delay={120}>
-						La pipeline costruisce, firma la versione e la consegna all'orchestratore. Da lì la
-						promozione è una scelta, non un rilascio.
-					</Reveal>
+					<div className="section__inner">
+						<Reveal as="p" className="section__kicker">
+							Deploy
+						</Reveal>
+						<Reveal as="h2" className="section__title" delay={60}>
+							Un tag. Ed è online.
+						</Reveal>
+						<Reveal as="p" className="section__lede" delay={120}>
+							La pipeline costruisce, firma la versione e la consegna all'orchestratore. Da lì la
+							promozione è una scelta, non un rilascio.
+						</Reveal>
 
-					<Reveal className="terminal" delay={180}>
-						<div className="terminal__bar">
-							<span className="shell__dot" />
-							<span className="shell__dot" />
-							<span className="shell__dot" />
-							<span className="shell__url">🚀 Build and deploy</span>
-						</div>
-						<pre className="terminal__body">
-							<code>
-								<span className="terminal__cmd">$ git tag 0.3.1 &amp;&amp; git push --tags</span>
-								{"\n"}
-								<span className="terminal__ok">✓</span> build      dist/ pronto in 4.1s{"\n"}
-								<span className="terminal__ok">✓</span> publish    checkout-new@0.3.1{"\n"}
-								<span className="terminal__ok">✓</span> live       canary 10% · produzione
-							</code>
-						</pre>
-					</Reveal>
+						<Reveal className="terminal" delay={180}>
+							<div className="terminal__bar">
+								<span className="shell__dot" />
+								<span className="shell__dot" />
+								<span className="shell__dot" />
+								<span className="shell__url">🚀 Build and deploy</span>
+							</div>
+							<pre className="terminal__body">
+								<code>
+									<span className="terminal__cmd">$ git tag 0.3.1 &amp;&amp; git push --tags</span>
+									{"\n"}
+									<span className="terminal__ok">✓</span> build      dist/ pronto in 4.1s{"\n"}
+									<span className="terminal__ok">✓</span> publish    checkout-new@0.3.1{"\n"}
+									<span className="terminal__ok">✓</span> live       canary 10% · produzione
+								</code>
+							</pre>
+						</Reveal>
 
-					<Reveal className="closing" delay={240}>
-						<h2 className="closing__title">Componi l'interfaccia. Non il calendario.</h2>
-						<div className="hero__actions">
-							<a className="btn btn--primary" href="https://console.mfe-orchestrator.dev">
-								Apri la console
-							</a>
-							<a className="btn btn--ghost" href="#panoramica">
-								Torna su <span aria-hidden="true">›</span>
-							</a>
-						</div>
-					</Reveal>
+						<Reveal className="closing" delay={240}>
+							<h2 className="closing__title">Componi l'interfaccia. Non il calendario.</h2>
+							<div className="hero__actions">
+								<a className="btn btn--primary" href="https://console.mfe-orchestrator.dev">
+									Apri la console
+								</a>
+								<a className="btn btn--ghost" href="#panoramica">
+									Torna su <span aria-hidden="true">›</span>
+								</a>
+							</div>
+						</Reveal>
+					</div>
 				</section>
 			</main>
 

@@ -426,21 +426,17 @@
 /* ---------- sections ---------- */
 
 .section {
-	max-width: 1060px;
-	margin: 0 auto;
 	padding: clamp(80px, 11vw, 132px) 22px;
 	scroll-margin-top: 60px;
 }
 
 .section--alt {
-	max-width: none;
 	background: var(--bg-alt);
 }
 
-.section--alt > * {
+.section__inner {
 	max-width: 1016px;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0 auto;
 }
 
 .section__title {
