@@ -3,10 +3,17 @@ import { useEffect, useRef, useState } from "react"
 import "./Landing.css"
 
 const NAV = [
-	{ id: "panoramica", label: "Panoramica" },
-	{ id: "funzionalita", label: "Funzionalità" },
-	{ id: "architettura", label: "Architettura" },
+	{ id: "panoramica", label: "Start" },
+	{ id: "funzionalita", label: "Poteri" },
+	{ id: "architettura", label: "Mappa" },
 	{ id: "deploy", label: "Deploy" },
+]
+
+const HUD = [
+	{ label: "Team", value: "x4" },
+	{ label: "Rebuild host", value: "x0" },
+	{ label: "Ambienti", value: "x3" },
+	{ label: "Rollback", value: "1 tasto" },
 ]
 
 const PANELS = [
@@ -20,7 +27,8 @@ const VARIANTS = [
 		id: "stable",
 		label: "checkout",
 		version: "1.8.0",
-		tag: "stabile · 90%",
+		tag: "Stabile",
+		share: 90,
 		steps: ["Indirizzo", "Pagamento", "Riepilogo"],
 		note: "Tre passaggi, il flusso servito alla maggior parte del traffico.",
 	},
@@ -28,7 +36,8 @@ const VARIANTS = [
 		id: "canary",
 		label: "checkout-new",
 		version: "0.3.1",
-		tag: "canary · 10%",
+		tag: "Canary",
+		share: 10,
 		steps: ["Paga in un tap"],
 		note: "Un solo passaggio, in rollout su una fascia di utenti. Nessun rebuild dell'host.",
 	},
@@ -37,29 +46,34 @@ const VARIANTS = [
 const FEATURES = [
 	{
 		size: "wide",
+		icon: "▚",
 		kicker: "Composizione",
-		title: "Module Federation, senza attriti.",
-		body: "Vite o Webpack, remote esposti come moduli standard. L'orchestratore risolve a runtime quale versione caricare, host e remote restano disaccoppiati.",
+		title: "Module Federation, senza attriti",
+		body: "Vite o Webpack, remote esposti come moduli standard. L'orchestratore risolve a runtime quale versione caricare: host e remote restano disaccoppiati.",
 	},
 	{
+		icon: "◆",
 		kicker: "Versioning",
-		title: "Atomico.",
+		title: "Atomico",
 		body: "Ogni pubblicazione è una versione immutabile. Il rollback è la selezione di quella precedente.",
 	},
 	{
+		icon: "▲",
 		kicker: "Rollout",
-		title: "Progressivo.",
+		title: "Progressivo",
 		body: "Canary per percentuale o per fascia di utenti, con promozione graduale a produzione.",
 	},
 	{
+		icon: "■",
 		kicker: "Ambienti",
-		title: "Uno per ogni stadio.",
+		title: "Uno per ogni stadio",
 		body: "Dev, staging e produzione condividono la stessa pipeline e differiscono solo nella versione risolta.",
 	},
 	{
 		size: "wide",
+		icon: "★",
 		kicker: "Autonomia",
-		title: "Ogni team pubblica quando è pronto.",
+		title: "Ogni team pubblica quando è pronto",
 		body: "Nessuna finestra di rilascio condivisa, nessun rebuild dell'host: si aggiorna un remote e la composizione lo recepisce al caricamento successivo.",
 	},
 ]
@@ -81,6 +95,48 @@ const STEPS = [
 		body: "L'host interroga l'orchestratore all'avvio, riceve la mappa dei remote e monta l'interfaccia.",
 	},
 ]
+
+const SPRITE_COLORS = {
+	1: "#000000",
+	2: "#29adff",
+	3: "#1d2b53",
+	4: "#ffec27",
+	5: "#ff004d",
+}
+
+const SPRITE = [
+	"..5......5..",
+	"..1......1..",
+	".1111111111.",
+	".1332222331.",
+	".1322222231.",
+	".1342222431.",
+	".1322222231.",
+	".1322332231.",
+	".1332222331.",
+	".1111111111.",
+	"..1......1..",
+	".111....111.",
+]
+
+function Sprite({ className = "" }) {
+	return (
+		<svg
+			className={`sprite ${className}`.trim()}
+			viewBox="0 0 12 12"
+			shapeRendering="crispEdges"
+			aria-hidden="true"
+			focusable="false">
+			{SPRITE.flatMap((row, y) =>
+				row.split("").map((cell, x) =>
+					SPRITE_COLORS[cell] ? (
+						<rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill={SPRITE_COLORS[cell]} />
+					) : null
+				)
+			)}
+		</svg>
+	)
+}
 
 function Reveal({ as: Tag = "div", delay = 0, className = "", children, ...rest }) {
 	const ref = useRef(null)
@@ -131,7 +187,7 @@ function Nav() {
 		<header className={`nav${scrolled ? " is-scrolled" : ""}`}>
 			<nav className="nav__inner" aria-label="Navigazione principale">
 				<a className="nav__brand" href="#panoramica">
-					<span className="nav__mark" aria-hidden="true" />
+					<Sprite className="sprite--nav" />
 					Orchestrator
 				</a>
 				<ul className="nav__links">
@@ -141,11 +197,24 @@ function Nav() {
 						</li>
 					))}
 				</ul>
-				<a className="nav__cta" href="#deploy">
-					Inizia
+				<a className="btn btn--small" href="#deploy">
+					Insert coin
 				</a>
 			</nav>
 		</header>
+	)
+}
+
+function Bar({ value }) {
+	const cells = 20
+	const filled = Math.round((value / 100) * cells)
+	return (
+		<span className="bar" role="img" aria-label={`${value}% del traffico`}>
+			{Array.from({ length: cells }, (_, i) => (
+				<span key={i} className={`bar__cell${i < filled ? " is-on" : ""}`} />
+			))}
+			<span className="bar__value">{value}%</span>
+		</span>
 	)
 }
 
@@ -181,12 +250,12 @@ function ShellMockup() {
 				<article className="panel panel--focus">
 					<header className="panel__head">
 						<span className="panel__name">{variant.label}</span>
-						<span className="panel__version panel__version--live">{variant.version}</span>
+						<span className="panel__version panel__version--live">v{variant.version}</span>
 					</header>
 
 					<div className="panel__steps" key={variant.id}>
 						{variant.steps.map((step, i) => (
-							<span className="panel__step" key={step} style={{ "--reveal-delay": `${i * 70}ms` }}>
+							<span className="panel__step" key={step} style={{ "--reveal-delay": `${i * 90}ms` }}>
 								{step}
 							</span>
 						))}
@@ -194,17 +263,20 @@ function ShellMockup() {
 
 					<p className="panel__note">{variant.note}</p>
 
-					<div className="segmented" role="group" aria-label="Versione servita">
-						{VARIANTS.map((v) => (
-							<button
-								type="button"
-								key={v.id}
-								className={`segmented__item${v.id === active ? " is-active" : ""}`}
-								aria-pressed={v.id === active}
-								onClick={() => setActive(v.id)}>
-								{v.tag}
-							</button>
-						))}
+					<div className="panel__foot">
+						<div className="segmented" role="group" aria-label="Versione servita">
+							{VARIANTS.map((v) => (
+								<button
+									type="button"
+									key={v.id}
+									className={`segmented__item${v.id === active ? " is-active" : ""}`}
+									aria-pressed={v.id === active}
+									onClick={() => setActive(v.id)}>
+									{v.tag}
+								</button>
+							))}
+						</div>
+						<Bar value={variant.share} />
 					</div>
 				</article>
 			</div>
@@ -221,34 +293,48 @@ function Diagram() {
 	]
 
 	return (
-		<svg className="diagram" viewBox="0 0 960 420" role="img" aria-label="L'host interroga l'orchestratore, che risolve la versione di ogni microfrontend">
+		<svg
+			className="diagram"
+			viewBox="0 0 960 420"
+			shapeRendering="crispEdges"
+			role="img"
+			aria-label="L'host interroga l'orchestratore, che risolve la versione di ogni microfrontend">
 			{[110, 350, 590, 830].map((cx) => (
-				<path
-					key={cx}
-					className="diagram__flow"
-					d={`M ${cx} 340 C ${cx} 290, 480 300, 480 250`}
-					fill="none"
-				/>
+				<g key={cx}>
+					<path className="diagram__flow" d={`M ${cx} 340 L ${cx} 300 L 480 300 L 480 252`} fill="none" />
+				</g>
 			))}
-			<path className="diagram__flow" d="M 480 170 L 480 84" fill="none" />
+			<path className="diagram__flow" d="M 480 168 L 480 86" fill="none" />
 
 			<g className="diagram__node diagram__node--host">
-				<rect x="330" y="20" width="300" height="64" rx="18" />
-				<text x="480" y="47" className="diagram__title">Host shell</text>
-				<text x="480" y="67" className="diagram__sub">un solo deploy, mai riscritto</text>
+				<rect x="330" y="22" width="300" height="64" />
+				<text x="480" y="48" className="diagram__title">
+					HOST SHELL
+				</text>
+				<text x="480" y="70" className="diagram__sub">
+					un solo deploy, mai riscritto
+				</text>
 			</g>
 
 			<g className="diagram__node diagram__node--hub">
-				<rect x="300" y="170" width="360" height="80" rx="22" />
-				<text x="480" y="205" className="diagram__title">MFE Orchestrator</text>
-				<text x="480" y="227" className="diagram__sub">registry · versioni · ambienti</text>
+				<rect x="300" y="168" width="360" height="84" />
+				<text x="480" y="202" className="diagram__title">
+					MFE ORCHESTRATOR
+				</text>
+				<text x="480" y="228" className="diagram__sub">
+					registry · versioni · ambienti
+				</text>
 			</g>
 
 			{remotes.map((remote) => (
 				<g className="diagram__node" key={remote.label}>
-					<rect x={remote.x} y="340" width="190" height="62" rx="18" />
-					<text x={remote.x + 95} y="370" className="diagram__title">{remote.label}</text>
-					<text x={remote.x + 95} y="389" className="diagram__sub">remoteEntry.js</text>
+					<rect x={remote.x} y="340" width="190" height="64" />
+					<text x={remote.x + 95} y="370" className="diagram__title diagram__title--sm">
+						{remote.label}
+					</text>
+					<text x={remote.x + 95} y="391" className="diagram__sub">
+						remoteEntry.js
+					</text>
 				</g>
 			))}
 		</svg>
@@ -258,45 +344,60 @@ function Diagram() {
 export const Landing = () => {
 	return (
 		<div className="landing">
+			<div className="crt" aria-hidden="true" />
 			<Nav />
 
 			<main>
 				<section className="hero" id="panoramica">
-					<div className="hero__glow" aria-hidden="true" />
 					<Reveal as="p" className="hero__kicker">
-						MFE Orchestrator
+						★ MFE Orchestrator ★
 					</Reveal>
-					<Reveal as="h1" className="hero__title" delay={80}>
+					<Reveal className="hero__sprite" delay={60}>
+						<Sprite className="sprite--hero" />
+					</Reveal>
+					<Reveal as="h1" className="hero__title" delay={120}>
 						Un host.
 						<br />
-						<span className="hero__gradient">Tutti i tuoi microfrontend.</span>
+						<span className="hero__accent">Tutti i tuoi microfrontend.</span>
 					</Reveal>
-					<Reveal as="p" className="hero__lede" delay={160}>
+					<Reveal as="p" className="hero__lede" delay={200}>
 						Pubblica ogni parte dell'interfaccia quando è pronta. L'orchestratore decide quale
 						versione va in scena, e la cambia senza ricostruire nulla.
 					</Reveal>
-					<Reveal className="hero__actions" delay={240}>
+					<Reveal className="hero__actions" delay={260}>
 						<a className="btn btn--primary" href="#deploy">
-							Inizia
+							Premi start
 						</a>
 						<a className="btn btn--ghost" href="#architettura">
-							Guarda come funziona <span aria-hidden="true">›</span>
+							Continua ▸
 						</a>
 					</Reveal>
-					<Reveal className="hero__stage" delay={320}>
+
+					<Reveal as="ul" className="hud" delay={320}>
+						{HUD.map((item) => (
+							<li className="hud__item" key={item.label}>
+								<span className="hud__label">{item.label}</span>
+								<span className="hud__value">{item.value}</span>
+							</li>
+						))}
+					</Reveal>
+
+					<Reveal className="hero__stage" delay={380}>
 						<ShellMockup />
 					</Reveal>
-					<Reveal as="p" className="hero__caption" delay={400}>
-						Quattro team, quattro cicli di rilascio, una sola interfaccia.
+					<Reveal as="p" className="hero__caption" delay={440}>
+						Quattro team, quattro cicli di rilascio, una sola interfaccia
+						<span className="cursor" aria-hidden="true" />
 					</Reveal>
 				</section>
 
 				<section className="section section--alt" id="funzionalita">
 					<div className="section__inner">
-						<Reveal as="h2" className="section__title">
-							Progettato per chi
-							<br />
-							rilascia spesso.
+						<Reveal as="p" className="section__kicker">
+							Poteri
+						</Reveal>
+						<Reveal as="h2" className="section__title" delay={60}>
+							Progettato per chi rilascia spesso
 						</Reveal>
 						<div className="bento">
 							{FEATURES.map((feature, i) => (
@@ -305,6 +406,9 @@ export const Landing = () => {
 									key={feature.title}
 									delay={i * 70}
 									className={`card${feature.size === "wide" ? " card--wide" : ""}`}>
+									<span className="card__icon" aria-hidden="true">
+										{feature.icon}
+									</span>
 									<p className="card__kicker">{feature.kicker}</p>
 									<h3 className="card__title">{feature.title}</h3>
 									<p className="card__body">{feature.body}</p>
@@ -317,10 +421,10 @@ export const Landing = () => {
 				<section className="section" id="architettura">
 					<div className="section__inner">
 						<Reveal as="p" className="section__kicker">
-							Architettura
+							Mappa
 						</Reveal>
 						<Reveal as="h2" className="section__title" delay={60}>
-							Risolto a runtime.
+							Risolto a runtime
 						</Reveal>
 						<Reveal as="p" className="section__lede" delay={120}>
 							L'host non conosce gli indirizzi dei remote: li chiede. Cambiare versione è cambiare
@@ -333,7 +437,7 @@ export const Landing = () => {
 						<div className="steps">
 							{STEPS.map((step, i) => (
 								<Reveal as="article" className="step" key={step.n} delay={i * 90}>
-									<span className="step__n">{step.n}</span>
+									<span className="step__n">Livello {step.n}</span>
 									<h3 className="step__title">{step.title}</h3>
 									<p className="step__body">{step.body}</p>
 								</Reveal>
@@ -348,7 +452,7 @@ export const Landing = () => {
 							Deploy
 						</Reveal>
 						<Reveal as="h2" className="section__title" delay={60}>
-							Un tag. Ed è online.
+							Un tag. Ed è online
 						</Reveal>
 						<Reveal as="p" className="section__lede" delay={120}>
 							La pipeline costruisce, firma la versione e la consegna all'orchestratore. Da lì la
@@ -360,15 +464,16 @@ export const Landing = () => {
 								<span className="shell__dot" />
 								<span className="shell__dot" />
 								<span className="shell__dot" />
-								<span className="shell__url">🚀 Build and deploy</span>
+								<span className="shell__url">build and deploy</span>
 							</div>
 							<pre className="terminal__body">
 								<code>
 									<span className="terminal__cmd">$ git tag 0.3.1 &amp;&amp; git push --tags</span>
 									{"\n"}
-									<span className="terminal__ok">✓</span> build      dist/ pronto in 4.1s{"\n"}
-									<span className="terminal__ok">✓</span> publish    checkout-new@0.3.1{"\n"}
-									<span className="terminal__ok">✓</span> live       canary 10% · produzione
+									<span className="terminal__ok">[OK]</span> build      dist/ pronto in 4.1s{"\n"}
+									<span className="terminal__ok">[OK]</span> publish    checkout-new@0.3.1{"\n"}
+									<span className="terminal__ok">[OK]</span> live       canary 10% · produzione
+									<span className="cursor" aria-hidden="true" />
 								</code>
 							</pre>
 						</Reveal>
@@ -380,7 +485,7 @@ export const Landing = () => {
 									Apri la console
 								</a>
 								<a className="btn btn--ghost" href="#panoramica">
-									Torna su <span aria-hidden="true">›</span>
+									Torna su ▴
 								</a>
 							</div>
 						</Reveal>
@@ -390,6 +495,7 @@ export const Landing = () => {
 
 			<footer className="footer">
 				<p>MFE Orchestrator · sandbox · microfrontend checkout-new</p>
+				<p className="footer__blink">Insert coin</p>
 			</footer>
 		</div>
 	)
